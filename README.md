@@ -1,7 +1,7 @@
 # iot_internet_wide_scanner
 It's a simple IOT internet wide scanner
 
-It is suposed that zmap and zgrab2 is installed on your system
+It is suposed that zmap and zgrab2 is installed on your system aand in PATH
 FOLLOW Instructions
 .......
 
