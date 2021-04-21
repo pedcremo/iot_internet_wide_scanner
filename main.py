@@ -1,6 +1,6 @@
 import schedule
 import time
-from scanner_module.scanner import startScanning
+from scanner_module.scanner import main as startScanning
 
 
 def scannerAgent():

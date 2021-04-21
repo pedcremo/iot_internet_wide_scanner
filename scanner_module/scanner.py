@@ -46,7 +46,7 @@ def mergeCSV_files(file_regex):
     combined_csv.to_csv( "scanned_hosts.csv", index=False, encoding='utf-8-sig')
 
 
-def startScanning():
+def main():
     # Llegim arxiu de configuracio
     configParser = configparser.ConfigParser()   
     configParser.read('./config.ini')
@@ -58,3 +58,6 @@ def startScanning():
         scan(port,networks,output_scans+'/results'+port+'.csv') 
 
     mergeCSV_files(output_scans+'/results*.csv')
+
+if __name__ == "__main__":
+    main()
