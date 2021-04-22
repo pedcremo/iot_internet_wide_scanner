@@ -27,6 +27,9 @@ Seguim instruccions de https://github.com/zmap/zmap/blob/master/INSTALL.md
 
 
 
+
+Per poder executar els scripts python del projecte 
+
 Instal·lem llibreries de dependències d'aquests scripts 
 sudo pip3 install -r requirements.txt
 .......
