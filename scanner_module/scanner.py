@@ -3,9 +3,12 @@
 #from libzmap import ZmapProcess
 import subprocess
 import shlex
-import configparser
+#import configparser
 import pandas as pd
 import glob2
+from utils import loadConfigFile 
+from utils import putElasticBeat 
+import datetime 
 
 def scan(port,networks,outputfile):
     try:
@@ -38,26 +41,34 @@ def scan(port,networks,outputfile):
         state = 'FAILED'
 
 # file_regex is the path with the regex to match files to merge
-def mergeCSV_files(file_regex):    
+def mergeAndIndexCSV_files(file_regex,elastic_index_name):    
     all_filenames = [i for i in glob2.glob(file_regex)]        
     #combine all files in the list
     combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ])
+
+    for index, row in combined_csv.iterrows():        
+        doc_body = {
+            'saddr':row['saddr'],
+            'daddr':row['daddr'],
+            'sport':row['sport'],
+            'last_seen': datetime.datetime.now()
+        }        
+        putElasticBeat(elastic_index_name,doc_body,row['saddr']+row['daddr'])        
     #export to csv
     combined_csv.to_csv( "scanned_hosts.csv", index=False, encoding='utf-8-sig')
 
 
 def main():
-    # Llegim arxiu de configuracio
-    configParser = configparser.ConfigParser()   
-    configParser.read('./config.ini')
-    ports =  configParser.get('SCANNER_CONFIG', 'ports')
-    networks = configParser.get('SCANNER_CONFIG', 'networks')
-    output_scans = configParser.get('OUTPUT_PARTIAL_SCANS', 'path')
+    # Llegim arxiu de configuracio general
+    gc = loadConfigFile()
+    ports =  gc.get('SCANNER_CONFIG', 'ports')
+    networks = gc.get('SCANNER_CONFIG', 'networks')
+    output_scans = gc.get('OUTPUT_PARTIAL_SCANS', 'path')
 
     for port in ports.split():
         scan(port,networks,output_scans+'/results'+port+'.csv') 
 
-    mergeCSV_files(output_scans+'/results*.csv')
+    mergeAndIndexCSV_files(output_scans+'/results*.csv',gc.get('SCANNER_CONFIG', 'index_name'))
 
 if __name__ == "__main__":
     main()
