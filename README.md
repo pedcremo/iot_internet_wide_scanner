@@ -1,3 +1,33 @@
+Llegir https://elastic.co/guide/en/elasticsearch/reference/master/docs-update.html
+
+body ={'script':{
+    'source':'ctx._source.services.add(params.service)',
+    'lang':'painless',
+    'params':{
+        'service':{
+            'port':8080,
+            'service':'http'
+            }
+        }
+    }
+}
+
+body2 ={'script':{
+    'source':'if (ctx._source.services.contains(params.service)) {ctx._source.services.remove(params.service)}',
+    'lang':'painless',
+    'params':{
+        'service':{
+            'service':'http',
+            'port': 80
+            }
+        }
+    }
+}
+
+ 
+es.update(index='test-scanning',doc_type = '_doc', body=body , request_timeout = 45, id = 1)
+
+
 # iot_internet_wide_scanner
 It's a simple IOT internet wide scanner
 
