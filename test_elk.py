@@ -29,6 +29,20 @@ def upsertElastic(index_name,json_body,id):
     except Exception as err:
         print("Elasticsearch index() ERROR (in upsertElasticBeat):", err)
 
+def putElasticBeat(index_name,json_body,id):
+    global es     
+    try:
+        response = es.index(
+            index = index_name,
+            doc_type = '_doc',
+            body = json_body,
+            request_timeout = 45,
+            id = id
+        )
+        print("response:",response)
+    except Exception as err:
+        print("Elasticsearch index() ERROR (in putElasticBeat):", err)
+
 def getService(port):
     ports_services = {
         '80': 'http',
@@ -46,18 +60,20 @@ def getService(port):
     }
     return ports_services[port]
         
-df=pd.read_csv('scanned_hosts_test.csv')
-elastic_index_name = 'test-scanning'
+#df=pd.read_csv('scanned_hosts_test.csv')
+df=pd.read_csv('scanned_hosts.csv')
+#elastic_index_name = 'test-scanning'
+elastic_index_name = 'wifibytes_scanned'
 
 for index, row in df.iterrows():        
         
-        doc_body = {
+        '''doc_body = {
             "script":{
                 "source":"ctx._source.services.add(params.service)",    
                 "params":{
                     "service":{
-                        "port":row['sport'],
-                        "protocol":getService(row['sport']),
+                        "port":str(row['sport']),
+                        "protocol":getService(str(row['sport'])),
                         'lastSeen_timestamp': datetime.datetime.now()
                     }
                 }
@@ -67,8 +83,8 @@ for index, row in df.iterrows():
                 "scanning_addr":row['daddr'],
                 "services":[
                     {
-                        "port":row['sport'],
-                        "protocol":getService(int(row['sport'])),
+                        "port":str(row['sport']),
+                        "protocol":getService(str(row['sport'])),
                         "lastSeen_timestamp":datetime.datetime.now()
                     }
                 ],
@@ -76,4 +92,12 @@ for index, row in df.iterrows():
             }
         }        
 
-        upsertElastic(elastic_index_name,doc_body,row['saddr']+row['daddr'])
+        upsertElastic(elastic_index_name,doc_body,hash(row['saddr']+row['daddr']+row['sport']))'''
+        doc_body = {
+                "target_addr":row['saddr'],
+                "scanning_addr":row['daddr'],
+                "port":str(row['sport']),
+                "protocol":getService(str(row['sport'])),
+                "lastScanned_timestamp": datetime.datetime.now()
+        }
+        putElasticBeat(elastic_index_name,doc_body,hash(row['saddr']+row['daddr']+str(row['sport'])))

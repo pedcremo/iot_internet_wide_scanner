@@ -46,13 +46,13 @@ def mergeAndIndexCSV_files(file_regex,elastic_index_name):
 
     for index, row in combined_csv.iterrows():        
         
-        doc_body = {
+        '''doc_body = {
             "script":{
                 "source":"ctx._source.services.add(params.service)",    
                 "params":{
                     "service":{
-                        "port":row['sport'],
-                        "protocol":getService(int(row['sport'])),
+                        "port":str(row['sport']),
+                        "protocol":getService(str(row['sport'])),
                         'lastSeen_timestamp': datetime.datetime.now()
                     }
                 }
@@ -62,8 +62,8 @@ def mergeAndIndexCSV_files(file_regex,elastic_index_name):
                 "scanning_addr":row['daddr'],
                 "services":[
                     {
-                        "port":row['sport'],
-                        "protocol":getService(int(row['sport'])),
+                        "port":str(row['sport']),
+                        "protocol":getService(str(row['sport'])),
                         "lastSeen_timestamp":datetime.datetime.now()
                     }
                 ],
@@ -72,7 +72,16 @@ def mergeAndIndexCSV_files(file_regex,elastic_index_name):
         }        
 
         #putElasticBeat(elastic_index_name,doc_body,row['saddr']+row['daddr'])       
-        upsertElastic(elastic_index_name,doc_body,row['saddr']+row['daddr'])
+        upsertElastic(elastic_index_name,doc_body,hash(row['saddr']+row['daddr']+str(row['sport'])))'''
+        doc_body = {
+                "target_addr":row['saddr'],
+                "scanning_addr":row['daddr'],
+                "port":str(row['sport']),
+                "protocol":getService(str(row['sport'])),
+                "lastScanned_timestamp": datetime.datetime.now()
+        }
+        putElasticBeat(elastic_index_name,doc_body,hash(row['saddr']+row['daddr']+str(row['sport'])))
+
     #export to csv
     combined_csv.to_csv( "scanned_hosts.csv", index=False, encoding='utf-8-sig')
 
@@ -83,6 +92,15 @@ def main():
     ports =  gc.get('SCANNER_CONFIG', 'ports')
     networks = gc.get('SCANNER_CONFIG', 'networks')
     output_scans = gc.get('OUTPUT_PARTIAL_SCANS', 'path')
+    
+    # Delete output temporal .csv files
+    files = glob2.glob(output_scans+'/results*.csv')
+    for f in files:
+        try:
+            f.unlink()
+        except OSError as e:
+            print("Error: %s : %s" % (f, e.strerror))
+
 
     # For every port specified en general config we perform an scanning on networks supplied too in gc
     for port in ports.split():
