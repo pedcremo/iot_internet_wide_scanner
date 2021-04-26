@@ -1,7 +1,7 @@
 
 from elasticsearch import helpers,Elasticsearch
 import datetime 
-import pandas
+import pandas as pd
 
 es = Elasticsearch(['https://09e202a3f8d74639b610daccc8dd4608.eu-west-2.aws.cloud.es.io'],http_auth=('elastic','56voSDEDVyVMLUnj7GlPWZ1a'),scheme="https",port=9243)
 
@@ -29,8 +29,25 @@ def upsertElastic(index_name,json_body,id):
     except Exception as err:
         print("Elasticsearch index() ERROR (in upsertElasticBeat):", err)
 
+def getService(port):
+    ports_services = {
+        '80': 'http',
+        '443': 'https',
+        '8080': 'http',
+        '8443': 'https',
+        '21': 'ftp',
+        '22': 'ssh',
+        '23': 'telnet',
+        '161': 'snmp',
+        '143': 'imap',
+        '25': 'smtp',
+        '5060': 'sip',
+        '554': 'rtsp'
+    }
+    return ports_services[port]
         
-df=pd.read_csv('scanned_hosts.csv')
+df=pd.read_csv('scanned_hosts_test.csv')
+elastic_index_name = 'test-scanning'
 
 for index, row in df.iterrows():        
         
@@ -40,7 +57,7 @@ for index, row in df.iterrows():
                 "params":{
                     "service":{
                         "port":row['sport'],
-                        "protocol":getService(int(row['sport'])),
+                        "protocol":getService(row['sport']),
                         'lastSeen_timestamp': datetime.datetime.now()
                     }
                 }

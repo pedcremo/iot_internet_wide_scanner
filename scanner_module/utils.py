@@ -71,19 +71,20 @@ def upsertElastic(index_name,json_body,id):
     except Exception as err:
         print("Elasticsearch index() ERROR (in upsertElasticBeat):", err)
 
-def getService(port):
+def getService(port):   
     ports_services = {
-        80: 'http',
-        443: 'https',
-        8080: 'http',
-        8443: 'https',
-        21: 'ftp',
-        22: 'ssh',
-        23: 'telnet',
-        162: 'snmp',
-        143: 'imap',
-        25: 'smtp',
-        5060: 'sip',
-        554: 'rtsp'
+        '80': 'http',
+        '443': 'https',
+        '8080': 'http',
+        '8443': 'https',
+        '21': 'ftp',
+        '22': 'ssh',
+        '23': 'telnet',
+        '161': 'snmp',
+        '143': 'imap',
+        '25': 'smtp',
+        '5060': 'sip',
+        '554': 'rtsp'
     }
+          
     return ports_services[port]
