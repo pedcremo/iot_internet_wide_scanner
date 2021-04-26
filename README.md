@@ -1,26 +1,44 @@
 Llegir https://elastic.co/guide/en/elasticsearch/reference/master/docs-update.html
 
-body ={'script':{
-    'source':'ctx._source.services.add(params.service)',
-    'lang':'painless',
-    'params':{
-        'service':{
-            'port':8080,
-            'service':'http'
-            }
+INSERT
+body = {
+    "target_addr":"185.142.11.9",
+    "scanning_addr":"test",
+    "services":[
+        "8080":{
+            "port":8080,
+            "protocol":"http",
+            "lastSeen_timestamp":datetime.datetime.now()
         }
+    ],
+    "lastScanned_timestamp": datetime.datetime.now()
+}
+
+es.index(index='test-scanning',doc_type = '_doc', body=body , request_timeout = 45, id = 1)
+
+
+UPDATE 
+bodyU ={"script":{
+    "source":"ctx._source.services.add(params.service)",    
+    "params":{
+        "service":{
+            "port":80,
+            "protocol":"http",
+            'lastSeen_timestamp': datetime.datetime.now()
+          }
+      }
     }
 }
 
-body2 ={'script':{
-    'source':'if (ctx._source.services.contains(params.service)) {ctx._source.services.remove(params.service)}',
-    'lang':'painless',
-    'params':{
-        'service':{
-            'service':'http',
-            'port': 80
-            }
-        }
+            
+DELETE 
+body2 ={"script":{
+    "source":"if (ctx._source.services.contains(params.service)) { ctx._source.services.remove(ctx._source.services.indexOf(params.service)) }",    
+    "params":{
+      "service":{            
+        "port": 8080            
+       }
+      }
     }
 }
 
@@ -29,32 +47,35 @@ es.update(index='test-scanning',doc_type = '_doc', body=body , request_timeout =
 
 
 # iot_internet_wide_scanner
-It's a simple IOT internet wide scanner
+It's a simple IOT internet wide scanner. Indeed, currently is only a wide open public IPv4 device scanner. So it scans wathever device behind a public IPv4 specified in general config independently whether is an IoT device or other type of device as a regular server, a workstation .... 
+
+# Prerequisites
+- It is suposed that zmap and zgrab2 is installed in your operating system and available in system PATH
+- Install scripts libraries dependencies as root(sudoer) `sudo pip3 install -r requirements.txt` 
+- Execute manually `sudo python3 scanner_module/scanner.py` and check scanning is working 
+- If previous step works run `sudo python3 main.py` it will run all scripts using schedule specified in main.py
+
+## INSTALL ZMAP (tool for scanning)
+We can find easily zmap as a package ready to install for our Operating system 
+In ubuntu 20.04 it will be as:
+Ex. `sudo apt install zmap`
+
+Fedora 19+ or EPEL 6+	`sudo yum install zmap`
+Debian 8+ or Ubuntu 14.04+	`sudo apt install zmap`
+Gentoo	`sudo emerge zmap`
+macOS (using Homebrew)	`brew install zmap`
+Arch Linux	`sudo pacman -S zmap`
+
+If zmap is not available as an installable package or is a very old version for your OS you always can compile it.
+It's open source.
+
+Clone github project `git clone https://github.com/zmap/zmap`
+Follow instructions from file https://github.com/zmap/zmap/blob/master/INSTALL.md
 
 
-# prerequisits
-It is suposed that zmap and zgrab2 is installed on your system and in PATH
+## INSTALL ZGRAB2 (tool for banner grabing)
 
-FOLLOW Instructions
-
-Si podem instal·lar el zmap i el zgrab2 amb el sistema de paquets del teu sistema operatiu fes-ho.
-
-Ex. En ubuntu fariem `sudo apt install zmap`
-
-`
-Fedora 19+ or EPEL 6+	sudo yum install zmap
-Debian 8+ or Ubuntu 14.04+	sudo apt install zmap
-Gentoo	sudo emerge zmap
-macOS (using Homebrew)	brew install zmap
-Arch Linux	sudo pacman -S zmap
-`
-
-NOTA: zgrab2 no està per a ubuntu 
-
-Com compilar zmap si no tenim el paquet o el binari per al nostre sistema operatiu:
-Clonem de github el projecte `git clone https://github.com/zmap/zmap`
-Seguim instruccions de https://github.com/zmap/zmap/blob/master/INSTALL.md
-
+NOTE: zgrab2 is not available for Ubuntu 
 
 Insta·lar zgrab2 https://github.com/zmap/zgrab2
 
@@ -69,17 +90,10 @@ descarreguem codi font amb ‘go get github.com/zmap/zgrab2’
 Prova: zgrab2 ftp -f inputFTP.csv -o outputFTP.csv
 
 
-Per poder executar els scripts python del projecte 
-
-Instal·lem llibreries de dependències d'aquests scripts 
-sudo pip3 install -r requirements.txt
-.......
-
-
-
-We get as base
-https://github.com/djet-sb/libzmap-python3/blob/master/libzmap/libzmap.py
-
 # TODO
 Per anotar geolocalització
 https://github.com/zmap/zannotate
+
+# References
+https://github.com/djet-sb/libzmap-python3/blob/master/libzmap/libzmap.py
+

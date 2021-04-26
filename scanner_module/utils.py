@@ -41,3 +41,49 @@ def putElasticBeat(index_name,json_body,id):
         print("response:",response)
     except Exception as err:
         print("Elasticsearch index() ERROR (in putElasticBeat):", err)
+
+def addServiceElasticBeat(index_name,port,protocol,banner,id):
+    global es
+    try:
+        update_query= {
+            'script':{
+                'source':'ctx._source.services.add(params.service)',    
+                'params':{
+                    'service':{
+                        'port':port,
+                        'protocol':protocol,
+                        'banner':banner,
+                        'lastSeen_timestamp': datetime.datetime.now()
+                    }
+                }
+            }
+        }
+        response = es.update(index=index_name,doc_type = '_doc', body=update_query , request_timeout = 45, id = id)
+        print("response:",response)
+    except Exception as err:
+        print("Elasticsearch index() ERROR (in putElasticBeat):", err)
+
+def upsertElastic(index_name,json_body,id):
+    global es     
+    try:
+        response = es.update(index=index_name,doc_type = '_doc', body=json_body , request_timeout = 45, id = id)
+        print("response:",response)
+    except Exception as err:
+        print("Elasticsearch index() ERROR (in upsertElasticBeat):", err)
+
+def getService(port):
+    ports_services = {
+        80: 'http',
+        443: 'https',
+        8080: 'http',
+        8443: 'https',
+        21: 'ftp',
+        22: 'ssh',
+        23: 'telnet',
+        162: 'snmp',
+        143: 'imap',
+        25: 'smtp',
+        5060: 'sip',
+        554: 'rtsp'
+    }
+    return ports_services[port]
