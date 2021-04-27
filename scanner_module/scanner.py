@@ -5,6 +5,7 @@ import glob2
 from utils import loadConfigFile 
 from utils import putElasticBeat,getService 
 import datetime 
+import os 
 
 # IMPORTANT NOTE: This script doesn't work without zmap installed on our system and available in system PATH # 
 
@@ -95,9 +96,10 @@ def main():
     
     # Delete output temporal .csv files
     files = glob2.glob(output_scans+'/results*.csv')
+    print(files)
     for f in files:
-        try:
-            f.unlink()
+        try:            
+            os.remove(f)
         except OSError as e:
             print("Error: %s : %s" % (f, e.strerror))
 

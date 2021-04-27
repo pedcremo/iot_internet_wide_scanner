@@ -1,10 +1,10 @@
 # iot_internet_wide_scanner
-It's a simple IOT internet wide scanner. Indeed, currently is only a wide open public IPv4 device scanner. So it scans wathever device behind a public IPv4 specified in general config independently whether is an IoT device or other type of device as a regular server, a workstation .... 
+It's a simple IOT internet wide scanner. Indeed, currently is only a wide open public IPv4 device scanner. So it scans wathever device behind a public IPv4 specified in general config.ini file independently whether is an IoT device or other type of device as a regular server, a workstation .... 
 
 # Prerequisites
-- It is suposed that zmap and zgrab2 is installed in your operating system and available in system PATH
-- Install scripts libraries dependencies as root(sudoer) `sudo pip3 install -r requirements.txt` 
-- Execute manually `sudo python3 scanner_module/scanner.py` and check scanning is working 
+- It is suposed that zmap and zgrab2 is installed in your operating system and available in system PATH (Instructions in document)
+- Install scripts python libraries dependencies as root(sudoer) `sudo pip3 install -r requirements.txt` 
+- Execute manually `sudo python3 scanner_module/scanner.py` and check scanning is working (NOTE )
 - If previous step works run `sudo python3 main.py` it will run all scripts using schedule specified in main.py
 
 ## INSTALL ZMAP (tool for scanning)
@@ -29,16 +29,29 @@ Follow instructions from file https://github.com/zmap/zmap/blob/master/INSTALL.m
 
 NOTE: zgrab2 is not available for Ubuntu 
 
-Insta·lar zgrab2 https://github.com/zmap/zgrab2
+Insta·lar zgrab2 des de codi en https://github.com/zmap/zgrab2
 
-- Instal·lem go (llenguatge de programació) En ubuntu 20.04 `sudo apt install golang` . En Ubuntu 18.04 - Com insta·lar go en ubuntu https://www.digitalocean.com/community/tutorials/como-instalar-go-en-ubuntu-18-04-es
-- export GOPATH=$HOME/go/
-- Una vegada instal·lat go entrem en  https://github.com/zmap/zgrab2 i llegim instruccions:
-descarreguem codi font amb ‘go get github.com/zmap/zgrab2’
-- Açò instal·larà zgrab2 en $GOPATH/src/github.com/zmap/zgrab2
-- cd /home/pedcremo/go/pkg/mod/github.com/zmap/zgrab2@v0.1.7/
-- make
-- ln -s /home/pedcremo/go/pkg/mod/github.com/zmap/zgrab2@v0.1.7/zgrab2 /usr/bin/zgrab2
+Primerament necessitem el llenguatge de programació go i el seu compilador instal·lat al sistema per poder instal·lar zgrab2
+Passem d'instal·lar els paquets oficials que venen al sistema operatiu (anem a baixar directament de golang.org go 1.16.3 o superior)
+https://golang.org/doc/install
+
+- cd /tmp
+- wget -d https://golang.org/dl/go1.16.3.linux-amd64.tar.gz
+- sudo rm -rf /usr/local/go
+- sudo tar -C /usr/local -xzf go1.16.3.linux-amd64.tar.gz
+- export PATH=$PATH:/usr/local/go/bin (add to the end of file $HOME/.profile)
+- source $HOME/.profile
+- execute `go version` i ha de coincidir amb la versió descarregada amb wget al segon pas
+- Després d'aquestos passos procedim a la instal·lació del zgrab2 amb `go get github.com/zmap/zgrab2`
+- `cd $HOME/go/pkg/mod/github.com/zmap/zgrab2@v0.1.7`
+- En aquest pas he tingut que passar-me a root `su root` fer `export PATH=$PATH:/usr/local/go/bin`
+- `make` (com a root)
+- `sudo ln -s $HOME/go/pkg/mod/github.com/zmap/zgrab2@v0.1.7/zgrab2 /usr/bin/zgrab2` (com a usuari sudoer)
+- Ara el comandament zgrab2 ha d'estar al PATH del sistema i al executar `zgrab2` ens apareixerà quelcom com:
+
+''' Please specify one command of: bacnet, banner, dnp3, fox, ftp, http, imap, ipp, modbus, mongodb, mssql, multiple, mysql, ntp, oracle, pop3, postgres, redis, siemens, smb, smtp, ssh, telnet or tls
+FATA[0000] could not parse flags: Please specify one command of: bacnet, banner, dnp3, fox, ftp, http, imap, ipp, modbus, mongodb, mssql, multiple, mysql, ntp, oracle, pop3, postgres, redis, siemens, smb, smtp, ssh, telnet or tls '''    
+
 
 Prova: zgrab2 ftp -f inputFTP.csv -o outputFTP.csv
 
