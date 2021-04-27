@@ -1,5 +1,7 @@
 LLEGIR article Abnormal Behavior-Based Detection of Shodan and Censys-Like Scanning
 
+IMPORTANT: Change config_template.ini name to config.ini and fill real elasticsearch cretendials
+
 # iot_internet_wide_scanner
 It's a simple IOT internet wide scanner. Indeed, currently is only a wide open public IPv4 device scanner. So it scans wathever device behind a public IPv4 specified in general config.ini file independently whether is an IoT device or other type of device as a regular server, a workstation .... 
 
