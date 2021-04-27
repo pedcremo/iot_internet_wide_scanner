@@ -45,35 +45,7 @@ def mergeAndIndexCSV_files(file_regex,elastic_index_name):
     #combine all files in the list
     combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ])
 
-    for index, row in combined_csv.iterrows():        
-        
-        '''doc_body = {
-            "script":{
-                "source":"ctx._source.services.add(params.service)",    
-                "params":{
-                    "service":{
-                        "port":str(row['sport']),
-                        "protocol":getService(str(row['sport'])),
-                        'lastSeen_timestamp': datetime.datetime.now()
-                    }
-                }
-            },
-            "upsert":{
-                "target_addr":row['saddr'],
-                "scanning_addr":row['daddr'],
-                "services":[
-                    {
-                        "port":str(row['sport']),
-                        "protocol":getService(str(row['sport'])),
-                        "lastSeen_timestamp":datetime.datetime.now()
-                    }
-                ],
-                "lastScanned_timestamp": datetime.datetime.now()
-            }
-        }        
-
-        #putElasticBeat(elastic_index_name,doc_body,row['saddr']+row['daddr'])       
-        upsertElastic(elastic_index_name,doc_body,hash(row['saddr']+row['daddr']+str(row['sport'])))'''
+    for index, row in combined_csv.iterrows():               
         doc_body = {
                 "target_addr":row['saddr'],
                 "scanning_addr":row['daddr'],
@@ -95,7 +67,7 @@ def main():
     output_scans = gc.get('OUTPUT_PARTIAL_SCANS', 'path')
     
     # Delete output temporal .csv files
-    files = glob2.glob(output_scans+'/results*.csv')
+    files = glob2.glob(output_scans+'/*.csv')
     print(files)
     for f in files:
         try:            

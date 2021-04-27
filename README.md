@@ -1,5 +1,9 @@
+LLEGIR article Abnormal Behavior-Based Detection of Shodan and Censys-Like Scanning
+
 # iot_internet_wide_scanner
 It's a simple IOT internet wide scanner. Indeed, currently is only a wide open public IPv4 device scanner. So it scans wathever device behind a public IPv4 specified in general config.ini file independently whether is an IoT device or other type of device as a regular server, a workstation .... 
+
+Similar to https://github.com/nray-scanner/nray
 
 # Prerequisites
 - It is suposed that zmap and zgrab2 is installed in your operating system and available in system PATH (Instructions in document)
@@ -118,3 +122,29 @@ body2 ={"script":{
  
 es.update(index='test-scanning',doc_type = '_doc', body=body , request_timeout = 45, id = 1)
 
+
+Eina en javascript similar a zgrab2 https://github.com/chichou/grab.js
+
+
+* List of Banner Grabbing Tools
+
+Netcat
+telnet
+Netcraft
+http recon
+ID Serve
+Recon-ng
+Uniscan
+SpiderFoot
+httprint
+Nmap
+ScanLine
+X probe
+P0f
+Satori
+Thanos
+Bannergrab
+synscan
+Disco
+Winfingerprint
+NetworkMiner
