@@ -13,6 +13,10 @@ Similar to https://github.com/nray-scanner/nray
 - Execute manually `sudo python3 scanner_module/scanner.py` and check scanning is working (NOTE )
 - If previous step works run `sudo python3 main.py` it will run all scripts using schedule specified in main.py
 
+# RUN
+port scanner -> sudo python3 src/modules/port_scanner/scanner.py
+banner grabber(depends on port scanner) 
+
 ## INSTALL ZMAP (tool for scanning)
 We can find easily zmap as a package ready to install for our Operating system 
 In ubuntu 20.04 it will be as:

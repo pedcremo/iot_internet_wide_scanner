@@ -2,13 +2,14 @@ import configparser
 from elasticsearch import helpers,Elasticsearch
 import datetime 
 from datetime import date
-#import csv 
 import subprocess
-
+import os
 
 def loadConfigFile():
     configParser = configparser.ConfigParser()   
-    configParser.read('./config.ini')
+    configParser.read(os.path.join(os.path.dirname(__file__), '../../config.ini'))
+    #configParser.read('config.ini')
+    #print(os.path.dirname(__file__))
     return configParser
 
 gc = loadConfigFile()

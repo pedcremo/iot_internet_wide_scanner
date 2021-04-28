@@ -1,11 +1,17 @@
 import subprocess
 import shlex
 import pandas as pd
-import glob2
-from utils import loadConfigFile 
-from utils import putElasticBeat,getService 
+import glob2 
 import datetime 
 import os 
+import sys
+
+PACKAGE_PARENT = '../../../'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+
+from src.modules.utils import loadConfigFile 
+from src.modules.utils import putElasticBeat,getService
 
 # IMPORTANT NOTE: This script doesn't work without zmap installed on our system and available in system PATH # 
 
@@ -40,7 +46,7 @@ def scan(port,networks,outputfile):
 
 # file_regex is the path with the regex to match .csv files to merge
 # meanwhile all registers from merged .csv file is indexed in elasticsearch
-def mergeAndIndexCSV_files(file_regex,elastic_index_name):    
+def mergeAndIndexCSV_files(file_regex,elastic_index_name,output_csv_file):    
     all_filenames = [i for i in glob2.glob(file_regex)]        
     #combine all files in the list
     combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ])
@@ -56,7 +62,7 @@ def mergeAndIndexCSV_files(file_regex,elastic_index_name):
         putElasticBeat(elastic_index_name,doc_body,hash(row['saddr']+row['daddr']+str(row['sport'])))
 
     #export to csv
-    combined_csv.to_csv( "scanned_hosts.csv", index=False, encoding='utf-8-sig')
+    combined_csv.to_csv(output_csv_file, index=False, encoding='utf-8-sig')
 
 
 def main():
@@ -66,6 +72,10 @@ def main():
     networks = gc.get('SCANNER_CONFIG', 'networks')
     output_scans = gc.get('OUTPUT_PARTIAL_SCANS', 'path')
     
+    # Create output folder for partial results if not exists
+    if not os.path.exists(output_scans):
+        os.makedirs(output_scans)
+
     # Delete output temporal .csv files
     files = glob2.glob(output_scans+'/*.csv')
     print(files)
@@ -81,7 +91,7 @@ def main():
         scan(port,networks,output_scans+'/results'+port+'.csv') 
 
     # Scanning results merged in one .csv file and indexed in elasticsearch cluster
-    mergeAndIndexCSV_files(output_scans+'/results*.csv',gc.get('ELASTIC_SERVER', 'index_name'))
+    mergeAndIndexCSV_files(output_scans+'/results*.csv',gc.get('ELASTIC_SERVER', 'index_name'),output_scans+'/scanned_hosts.csv')
 
 if __name__ == "__main__":
     main()
