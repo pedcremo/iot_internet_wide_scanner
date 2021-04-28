@@ -50,7 +50,7 @@ def mergeAndIndexCSV_files(file_regex,elastic_index_name,output_csv_file):
     all_filenames = [i for i in glob2.glob(file_regex)]        
     #combine all files in the list
     combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ])
-
+    '''
     for index, row in combined_csv.iterrows():               
         doc_body = {
                 "target_addr":row['saddr'],
@@ -60,7 +60,7 @@ def mergeAndIndexCSV_files(file_regex,elastic_index_name,output_csv_file):
                 "lastScanned_timestamp": datetime.datetime.now()
         }
         putElasticBeat(elastic_index_name,doc_body,hash(row['saddr']+row['daddr']+str(row['sport'])))
-
+    '''
     #export to csv
     combined_csv.to_csv(output_csv_file, index=False, encoding='utf-8-sig')
 
