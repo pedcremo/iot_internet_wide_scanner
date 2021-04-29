@@ -67,6 +67,27 @@ def addServiceElasticBeat(index_name,port,protocol,banner,id):
     except Exception as err:
         print("Elasticsearch index() ERROR (in putElasticBeat):", err)
 
+
+def uploadBannersELK(daddr,service,port,fileWithBanners):
+    global index_name
+    # Using readlines()    
+    file1 = open(fileWithBanners, 'r')
+    Lines = file1.readlines()
+ 
+    count = 0
+    # Strips the newline character
+    for line in Lines:
+        #count += 1
+        #print("Line{}: {}".format(count, line.strip()))
+        json_body = {
+            "script" : "ctx._source.banner_"+service+" = "+line.strip()
+        }
+        dict_aux = line
+        print(dict_aux['ip'])
+        id = hash(line.strip()['ip']+daddr+str(port))
+        upsertElastic(index_name,jsdoc,int(id) )
+
+
 def uploadPortScanELK(csv_path):
     global index_name
     df=pd.read_csv(csv_path)

@@ -6,7 +6,7 @@ PACKAGE_PARENT = '../../../'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
-from src.modules.utils import loadConfigFile, merge_files
+from src.modules.utils import loadConfigFile, merge_files, uploadBannersELK
 import subprocess
 import shlex
 
@@ -37,6 +37,8 @@ def getBanners(daddr,sport,input_file, output_scans):
                     stderr=subprocess.PIPE,
                     universal_newlines=True, bufsize=0)
         print(shlex.split(cmdline))
+        uploadBannersELK(daddr,service,sport,output_scans+'/out_zgrab_'+service+'.csv')
+        
     except OSError as e:
         print(e)
         raise EnvironmentError(1, "zgrab2 is not installed or could not be found in system path")
