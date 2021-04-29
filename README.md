@@ -1,5 +1,3 @@
-LLEGIR article Abnormal Behavior-Based Detection of Shodan and Censys-Like Scanning
-
 IMPORTANT: Change config_template.ini name to config.ini and fill real elasticsearch cretendials
 
 # iot_internet_wide_scanner
@@ -9,13 +7,14 @@ Similar to https://github.com/nray-scanner/nray
 
 # Prerequisites
 - It is suposed that zmap and zgrab2 is installed in your operating system and available in system PATH (Instructions in document)
+- It is suposed we have an instance of elasticsearch and kibana installed and ready to use
 - Install scripts python libraries dependencies as root(sudoer) `sudo pip3 install -r requirements.txt` 
 - Execute manually `sudo python3 scanner_module/scanner.py` and check scanning is working (NOTE )
 - If previous step works run `sudo python3 main.py` it will run all scripts using schedule specified in main.py
 
 # RUN
 port scanner -> sudo python3 src/modules/port_scanner/scanner.py
-banner grabber(depends on port scanner) 
+banner grabber(depends on port scanner) -> sudo python3 src/modules/port_scanner/scanner.py
 
 ## INSTALL ZMAP (tool for scanning)
 We can find easily zmap as a package ready to install for our Operating system 
@@ -75,6 +74,8 @@ https://github.com/djet-sb/libzmap-python3/blob/master/libzmap/libzmap.py
 
 
 # Apunts per organitzar
+LLEGIR article Abnormal Behavior-Based Detection of Shodan and Censys-Like Scanning
+
 
 https://www.elastic.co/es/blog/elasticsearch-and-siem-implementing-host-portscan-detection
 
