@@ -4,6 +4,8 @@ import datetime
 from datetime import date
 import subprocess
 import os
+import pandas as pd 
+import glob2 
 
 def loadConfigFile():
     configParser = configparser.ConfigParser()   
@@ -16,6 +18,7 @@ gc = loadConfigFile()
 endpoint = gc.get('ELASTIC_SERVER', 'endpoint')
 username = gc.get('ELASTIC_SERVER', 'username')
 password = gc.get('ELASTIC_SERVER', 'password')
+index_name = gc.get('ELASTIC_SERVER', 'index_name')
 port = gc.get('ELASTIC_SERVER', 'port')
 es = Elasticsearch([endpoint],http_auth=(username,password),scheme="https",port=port)
 
@@ -41,7 +44,7 @@ def putElasticBeat(index_name,json_body,id):
         )
         print("response:",response)
     except Exception as err:
-        print("Elasticsearch index() ERROR (in putElasticBeat):", err)
+        print("Elasticsearch index(" + index_name + ") ERROR (in putElasticBeat):", err)
 
 def addServiceElasticBeat(index_name,port,protocol,banner,id):
     global es
@@ -64,6 +67,21 @@ def addServiceElasticBeat(index_name,port,protocol,banner,id):
     except Exception as err:
         print("Elasticsearch index() ERROR (in putElasticBeat):", err)
 
+def uploadPortScanELK(csv_path):
+    global index_name
+    df=pd.read_csv(csv_path)
+    
+    for index, row in df.iterrows():               
+        doc_body = {
+                "target_addr":row['saddr'],
+                "scanning_addr":row['daddr'],
+                "port":str(row['sport']),
+                "protocol":getService(str(row['sport'])),
+                "lastScanned_timestamp": datetime.datetime.now()
+        }
+        putElasticBeat(index_name,doc_body,hash(row['saddr']+row['daddr']+str(row['sport'])))
+    
+
 def upsertElastic(index_name,json_body,id):
     global es     
     try:
@@ -71,6 +89,26 @@ def upsertElastic(index_name,json_body,id):
         print("response:",response)
     except Exception as err:
         print("Elasticsearch index() ERROR (in upsertElasticBeat):", err)
+
+# file_regex is the path with the regex to match .csv files to merge
+# meanwhile all registers from merged .csv file is indexed in elasticsearch
+def mergeCSV_files(file_regex,output_csv_file):    
+    all_filenames = [i for i in glob2.glob(file_regex)]        
+    #combine all files in the list
+    combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ])
+    #export to csv
+    print("OUTPUT_CSV_FILE = "+output_csv_file)
+    combined_csv.to_csv(output_csv_file, index=False, encoding='utf-8-sig')
+
+# Merge several .txt files in ONE
+def merge_files(file_regex,output_csv_file):    
+    all_filenames = [i for i in glob2.glob(file_regex)]
+
+    with open(output_csv_file, 'w') as outfile:
+        for fname in all_filenames:
+            with open(fname) as infile:
+                for line in infile:
+                    outfile.write(line)
 
 def getService(port):   
     ports_services = {

@@ -1,15 +1,14 @@
 import pandas as pd
-from utils import loadConfigFile 
+import os 
+import sys
+
+PACKAGE_PARENT = '../../../'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+
+from src.modules.utils import loadConfigFile, merge_files
 import subprocess
 import shlex
-
-df=pd.read_csv('./scanned_hosts.csv')
-print(df)
-# Read general config 
-gc = loadConfigFile()
-ports =  gc.get('SCANNER_CONFIG', 'ports')
-output_scans = gc.get('OUTPUT_PARTIAL_SCANS', 'path')
-
 
 def getServicePort(sport):
     ports_services = {
@@ -26,8 +25,8 @@ def getServicePort(sport):
     except KeyError as e:
         return ""
 
-def getBanners(daddr,sport,input_file):
-    global output_scans
+def getBanners(daddr,sport,input_file, output_scans):
+    
     try:
         #zgrab2 ftp -f inputFTP.csv -o outputFTP.csv
         service = getServicePort(sport)
@@ -42,10 +41,27 @@ def getBanners(daddr,sport,input_file):
         print(e)
         raise EnvironmentError(1, "zgrab2 is not installed or could not be found in system path")
 
+def main():
+    # Read general config 
+    gc = loadConfigFile()
+    ports =  gc.get('SCANNER_CONFIG', 'ports')
+    output_scans = gc.get('OUTPUT_PARTIAL_SCANS', 'path')
 
-# For every port specified en general config we perform an scanning on networks supplied too in gc
-for port in ports.split():
-    dfaux = df[df.sport == int(port)]
-    #print(dfaux)
-    dfaux['saddr'].to_csv(output_scans+"/input_zgrab_"+str(port)+".csv",index=False,header=False)
-    getBanners(df['daddr'][0],port,output_scans+"/input_zgrab_"+str(port)+".csv")
+    # Get pandas dataframe from CSV
+    df=pd.read_csv(output_scans+'/scanned_hosts.csv')
+    print(df)
+    
+    # For every port specified en general config we perform an scanning on networks supplied too in gc
+    for port in ports.split():
+        dfaux = df[df.sport == int(port)]
+        #print(dfaux)
+        dfaux['saddr'].to_csv(output_scans+"/input_zgrab_"+str(port)+".csv",index=False,header=False)
+        getBanners(df['daddr'][0],port,output_scans+"/input_zgrab_"+str(port)+".csv",output_scans)
+
+    # Scanning results merged in one .csv file 
+    merge_files(output_scans+'/out_zgrab_*.csv',output_scans+'/banners_hosts.csv')
+
+if __name__ == "__main__":
+    main()
+
+
