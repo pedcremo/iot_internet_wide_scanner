@@ -4,6 +4,7 @@ import pandas as pd
 import datetime 
 import os 
 import sys
+import glob2
 
 PACKAGE_PARENT = '../../../'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
@@ -73,7 +74,7 @@ def main():
     # Scanning results merged in one .csv file 
     mergeCSV_files(output_scans+'/results*.csv',output_scans+'/scanned_hosts.csv')
 
-    # Upload all port_scanning information on  ElasticSearch
+    # Upload all port_scanning information to ElasticSearch
     uploadPortScanELK(output_scans+'/scanned_hosts.csv')
 if __name__ == "__main__":
     main()

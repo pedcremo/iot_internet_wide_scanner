@@ -6,6 +6,7 @@ import subprocess
 import os
 import pandas as pd 
 import glob2 
+import json
 
 def loadConfigFile():
     configParser = configparser.ConfigParser()   
@@ -68,25 +69,35 @@ def addServiceElasticBeat(index_name,port,protocol,banner,id):
         print("Elasticsearch index() ERROR (in putElasticBeat):", err)
 
 
-def uploadBannersELK(daddr,service,port,fileWithBanners):
+def uploadBannersELK(regex_path_banners):
     global index_name
-    # Using readlines()    
-    file1 = open(fileWithBanners, 'r')
-    Lines = file1.readlines()
- 
-    count = 0
-    # Strips the newline character
-    for line in Lines:
-        #count += 1
-        #print("Line{}: {}".format(count, line.strip()))
-        json_body = {
-            "script" : "ctx._source.banner_"+service+" = "+line.strip()
-        }
-        dict_aux = line
-        print(dict_aux['ip'])
-        id = hash(line.strip()['ip']+daddr+str(port))
-        upsertElastic(index_name,jsdoc,int(id) )
+    # Delete output temporal .csv files
+    files = glob2.glob(regex_path_banners)
+    print(files)
+    for f in files:
+        file1 = open(f, 'r')
+        try:
+            tokens = f.split("_")
+            service = tokens[2]
+            port = tokens[3]
+            grabbing_ip_source = tokens[4]
 
+            Lines = file1.readlines()
+
+            for line in Lines:
+                json_body = {
+                    "script" : "ctx._source.banner_"+service+" = "+line.strip()
+                }
+                
+                try:
+                    dict_aux = json.loads(line)
+                    #id_ = hash(dict_aux['ip']+grabbing_ip_source+port)
+                    upsertElastic(index_name,json_body,getId(dict_aux['ip']+grabbing_ip_source+port)) 
+                except json.decoder.JSONDecodeError as jerr:
+                    print ("Error parsing JSON "+line+" skipping...", jerr)
+
+        except IndexError as errI:
+             print("File not valid to index = "+f+" skipping...", errI)
 
 def uploadPortScanELK(csv_path):
     global index_name
@@ -100,8 +111,11 @@ def uploadPortScanELK(csv_path):
                 "protocol":getService(str(row['sport'])),
                 "lastScanned_timestamp": datetime.datetime.now()
         }
-        putElasticBeat(index_name,doc_body,hash(row['saddr']+row['daddr']+str(row['sport'])))
+        putElasticBeat(index_name,doc_body,getId(row['saddr']+row['daddr']+str(row['sport'])))
     
+def getId(targetIp_sourceIp_targetPort):
+    #print("HAsh generat amb "+targetIp_sourceIp_targetPort+" hash="+str(hash(targetIp_sourceIp_targetPort)))
+    return targetIp_sourceIp_targetPort
 
 def upsertElastic(index_name,json_body,id):
     global es     
@@ -109,7 +123,7 @@ def upsertElastic(index_name,json_body,id):
         response = es.update(index=index_name,doc_type = '_doc', body=json_body , request_timeout = 45, id = id)
         print("response:",response)
     except Exception as err:
-        print("Elasticsearch index() ERROR (in upsertElasticBeat):", err)
+        print("Elasticsearch index("+index_name+") ERROR (in upsertElasticBeat):", err)
 
 # file_regex is the path with the regex to match .csv files to merge
 # meanwhile all registers from merged .csv file is indexed in elasticsearch

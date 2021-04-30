@@ -30,14 +30,14 @@ def getBanners(daddr,sport,input_file, output_scans):
     try:
         #zgrab2 ftp -f inputFTP.csv -o outputFTP.csv
         service = getServicePort(sport)
-        cmdline = 'zgrab2 '+service+' -f '+input_file+' -o '+output_scans+'/out_zgrab_'+service+'.csv'  
+        cmdline = 'zgrab2 '+service+' -f '+input_file+' -o '+output_scans+'/out_zgrab_'+service+'_'+sport+'_'+daddr+'_.csv'  
 
         zgrab2_proc = subprocess.Popen(args=shlex.split(cmdline), 
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     universal_newlines=True, bufsize=0)
         print(shlex.split(cmdline))
-        uploadBannersELK(daddr,service,sport,output_scans+'/out_zgrab_'+service+'.csv')
+        #uploadBannersELK(daddr,service,sport,output_scans+'/out_zgrab_'+service+'_'+sport+'_'+daddr.csv')
         
     except OSError as e:
         print(e)
@@ -62,6 +62,9 @@ def main():
 
     # Scanning results merged in one .csv file 
     merge_files(output_scans+'/out_zgrab_*.csv',output_scans+'/banners_hosts.csv')
+
+    # Upload all banner information to ElasticSearch
+    uploadBannersELK(output_scans+'/out_zgrab_*.csv')
 
 if __name__ == "__main__":
     main()
