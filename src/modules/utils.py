@@ -85,12 +85,21 @@ def uploadBannersELK(regex_path_banners):
             Lines = file1.readlines()
 
             for line in Lines:
-                json_body = {
-                    "script" : "ctx._source.banner_"+service+" = "+line.strip()
-                }
-                
+
                 try:
                     dict_aux = json.loads(line)
+                    #print(dict_aux)
+                    '''json_body = {
+                        "script" : "ctx._source.banner = '"+json.dumps(dict_aux)+"'"
+                    }'''
+                    json_body = {
+                        "doc": {
+                            "banner": dict_aux
+                        }
+                    }
+                            
+                    
+                    #print(json_body)
                     #id_ = hash(dict_aux['ip']+grabbing_ip_source+port)
                     upsertElastic(index_name,json_body,getId(dict_aux['ip']+grabbing_ip_source+port)) 
                 except json.decoder.JSONDecodeError as jerr:
