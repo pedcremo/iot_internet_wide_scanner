@@ -14,7 +14,7 @@ Similar to https://github.com/nray-scanner/nray
 
 # RUN
 - port scanner -> `sudo python3 src/modules/port_scanner/scanner.py`
-- banner grabber(depends on port scanner) -> `python3 src/modules/banner_grabber/banner.py`
+- banner grabber(depends on port scanner) -> `sudo python3 src/modules/banner_grabber/banner.py`
 
 ## INSTALL ZMAP (tool for scanning)
 We can find easily zmap as a package ready to install for our Operating system 
