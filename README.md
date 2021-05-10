@@ -74,6 +74,13 @@ https://github.com/djet-sb/libzmap-python3/blob/master/libzmap/libzmap.py
 
 
 # Apunts per organitzar
+
+Per obtindre certificat openssl s_client --connect 185.142.11.129:443
+Per obtenir tots els rangs IPv4 públics del mòn `wget http://www.ipdeny.com/ipblocks/data/countries/cn.zone` 
+`zmap -w cn.zone -p 80 -B 100M -o 80.res` #Escanegem tots els servers http del mòn
+`/zgrab2 -input-file=80.res --output-file=hk.txt --senders=1000 http` #Extraiem els banner http
+
+
 LLEGIR article Abnormal Behavior-Based Detection of Shodan and Censys-Like Scanning
 
 
