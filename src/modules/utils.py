@@ -43,7 +43,7 @@ def putElasticBeat(index_name,json_body,id):
             request_timeout = 45,
             id = id
         )
-        print("response:",response)
+        #print("response:",response)
     except Exception as err:
         print("Elasticsearch index(" + index_name + ") ERROR (in putElasticBeat):", err)
 
@@ -64,7 +64,7 @@ def addServiceElasticBeat(index_name,port,protocol,banner,id):
             }
         }
         response = es.update(index=index_name,doc_type = '_doc', body=update_query , request_timeout = 45, id = id)
-        print("response:",response)
+        #print("response:",response)
     except Exception as err:
         print("Elasticsearch index() ERROR (in putElasticBeat):", err)
 
@@ -73,16 +73,20 @@ def uploadBannersELK(regex_path_banners):
     global index_name
     # Delete output temporal .csv files
     files = glob2.glob(regex_path_banners)
-    print(files)
+    print("UPLOADING FILES "+str(files))
     for f in files:
         file1 = open(f, 'r')
         try:
             tokens = f.split("_")
+            print(tokens)
             service = tokens[2]
             port = tokens[3]
             grabbing_ip_source = tokens[4]
 
             Lines = file1.readlines()
+            
+            print("UPLOADING Arxiu "+f)
+                    
 
             for line in Lines:
 
@@ -101,6 +105,7 @@ def uploadBannersELK(regex_path_banners):
                     
                     #print(json_body)
                     #id_ = hash(dict_aux['ip']+grabbing_ip_source+port)
+                    
                     upsertElastic(index_name,json_body,getId(dict_aux['ip']+grabbing_ip_source+port)) 
                 except json.decoder.JSONDecodeError as jerr:
                     print ("Error parsing JSON "+line+" skipping...", jerr)
@@ -130,7 +135,7 @@ def upsertElastic(index_name,json_body,id):
     global es     
     try:
         response = es.update(index=index_name,doc_type = '_doc', body=json_body , request_timeout = 45, id = id)
-        print("response:",response)
+        #print("response:",response)
     except Exception as err:
         print("Elasticsearch index("+index_name+") ERROR (in upsertElasticBeat):", err)
 
@@ -140,14 +145,13 @@ def mergeCSV_files(file_regex,output_csv_file):
     all_filenames = [i for i in glob2.glob(file_regex)]        
     #combine all files in the list
     combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ])
-    #export to csv
-    print("OUTPUT_CSV_FILE = "+output_csv_file)
+    #export to csv    
     combined_csv.to_csv(output_csv_file, index=False, encoding='utf-8-sig')
 
 # Merge several .txt files in ONE
 def merge_files(file_regex,output_csv_file):    
     all_filenames = [i for i in glob2.glob(file_regex)]
-
+    print("MERGING ",all_filenames)
     with open(output_csv_file, 'w') as outfile:
         for fname in all_filenames:
             with open(fname) as infile:
