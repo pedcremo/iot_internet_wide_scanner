@@ -74,6 +74,11 @@ https://github.com/Ullaakut/cameradar
 
 Ex: `docker run -t ullaakut/cameradar -t 185.81.77.235 -p1554`
 
+- Definir TOC del TFM i anar perfilant
+- Dockeritzar projecte Python port scanneri banner grabbing
+- Fer alguna cosa d'annotació de tags ztag(obsolet) mirar si hi ha alguna eina a elastic
+- Millorar codi
+
 # References
 https://github.com/djet-sb/libzmap-python3/blob/master/libzmap/libzmap.py
 
