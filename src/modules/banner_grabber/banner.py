@@ -23,7 +23,7 @@ def getServicePort(sport):
     try:
         return ports_services[sport]
     except KeyError as e:
-        return ""
+        return "banner" #Try to get banner generically
 
 def getBanners(daddr,sport,input_file, output_scans):
     

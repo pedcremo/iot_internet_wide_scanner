@@ -167,7 +167,8 @@ def getService(port):
         '143': 'imap',
         '25': 'smtp',
         '5060': 'sip',
-        '554': 'rtsp'
+        '554': 'rtsp',
+        '1554':'rtsp',
     }
           
     return ports_services[port]

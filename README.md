@@ -69,6 +69,11 @@ Prova: zgrab2 ftp -f inputFTP.csv -o outputFTP.csv
 Per anotar geolocalització
 https://github.com/zmap/zannotate
 
+Per detectar cameres amb RTSP
+https://github.com/Ullaakut/cameradar
+
+Ex: `docker run -t ullaakut/cameradar -t 185.81.77.235 -p1554`
+
 # References
 https://github.com/djet-sb/libzmap-python3/blob/master/libzmap/libzmap.py
 
