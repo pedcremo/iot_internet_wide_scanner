@@ -38,7 +38,7 @@ Entrem a una consola
 `docker run -v "$(pwd)"/src:/root/iot_wide_scanner/src --name test-container-iot -it iot-scanner-image /bin/bash`
 
 Executem el scanner
-docker run -v "$(pwd)"/src:/root/iot_wide_scanner/src --name test-container-iot -it iot-scanner-image /bin/bash
+`docker run -v "$(pwd)"/src:/root/iot_wide_scanner/src --name test-container-iot -it iot-scanner-image`
 ## HARD WAY
 ### INSTALL ZMAP (tool for scanning)
 We can find easily zmap as a package ready to install for our Operating system 
