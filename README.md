@@ -34,8 +34,11 @@ Execute container in interactive mode to do some checkings/testings
 `docker container stop test-container-iot` #Stop running container
 `docker container rm test-container-iot` #Remove container 
 
-`docker run -v src:/root/iot_wide_scanner --name test-container-iot -it iot-scanner-image /bin/bash`
+Entrem a una consola 
+`docker run -v "$(pwd)"/src:/root/iot_wide_scanner/src --name test-container-iot -it iot-scanner-image /bin/bash`
 
+Executem el scanner
+docker run -v "$(pwd)"/src:/root/iot_wide_scanner/src --name test-container-iot -it iot-scanner-image /bin/bash
 ## HARD WAY
 ### INSTALL ZMAP (tool for scanning)
 We can find easily zmap as a package ready to install for our Operating system 

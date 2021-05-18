@@ -38,5 +38,6 @@ RUN go get github.com/zmap/zgrab2
 RUN cd /root/go/pkg/mod/github.com/zmap/zgrab2@v0.1.7 && go mod download github.com/stretchr/testify
 RUN cd /root/go/pkg/mod/github.com/zmap/zgrab2@v0.1.7 && make
 RUN ln -s /root/go/pkg/mod/github.com/zmap/zgrab2@v0.1.7/zgrab2 /usr/bin/zgrab2
-#CMD RUN PRoGRAM
+WORKDIR /root/iot_wide_scanner
+CMD [ "python3", "./src/main.py" ]
 
