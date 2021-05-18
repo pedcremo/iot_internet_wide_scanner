@@ -16,7 +16,28 @@ Similar to https://github.com/nray-scanner/nray
 - port scanner -> `sudo python3 src/modules/port_scanner/scanner.py`
 - banner grabber(depends on port scanner) -> `sudo python3 src/modules/banner_grabber/banner.py`
 
-## INSTALL ZMAP (tool for scanning)
+# INSTALL 
+## EASY WAY
+### DOCKER https://www.howtoforge.com/tutorial/how-to-create-docker-images-with-dockerfile/
+Go to project root folder
+With docker properly installed in your system, execute:
+`docker build -t iot-scanner-image .`
+
+List images with
+`docker image ls`
+and check iot-scanner-image appears in list
+
+Execute container 
+`docker run -d -v /src:/opt/iot_wide_scanner --name test-container-iot iot-scanner-image`
+
+Execute container in interactive mode to do some checkings/testings
+`docker container stop test-container-iot` #Stop running container
+`docker container rm test-container-iot` #Remove container 
+
+`docker run -v src:/root/iot_wide_scanner --name test-container-iot -it iot-scanner-image /bin/bash`
+
+## HARD WAY
+### INSTALL ZMAP (tool for scanning)
 We can find easily zmap as a package ready to install for our Operating system 
 In ubuntu 20.04 it will be as:
 Ex. `sudo apt install zmap`
@@ -34,7 +55,7 @@ Clone github project `git clone https://github.com/zmap/zmap`
 Follow instructions from file https://github.com/zmap/zmap/blob/master/INSTALL.md
 
 
-## INSTALL ZGRAB2 (tool for banner grabing)
+### INSTALL ZGRAB2 (tool for banner grabing)
 
 NOTE: zgrab2 is not available for Ubuntu 
 
