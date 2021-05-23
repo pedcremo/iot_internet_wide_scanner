@@ -17,9 +17,9 @@ from src.modules.utils import putElasticBeat,getService
 
 # Scan port (only one) in all networks supplied in networks parameter
 # as a result we get a .csv outputfile with a line containing saddr,daddr,sport on opened host/port
-def scan(port,networks,outputfile):
+def scan(port,networks,local_interface_name, outputfile):
     try:
-        cmdline = 'zmap -p '+str(port)+' '+networks+' -f "saddr,daddr,sport"  --output-module=csv -o ' + outputfile
+        cmdline = 'zmap -i '+local_interface_name +' -p '+str(port)+' '+networks+' -f "saddr,daddr,sport"  --output-module=csv -o ' + outputfile
         zmap_proc = subprocess.Popen(args=shlex.split(cmdline), 
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
@@ -51,6 +51,7 @@ def main():
     gc = loadConfigFile()
     ports =  gc.get('SCANNER_CONFIG', 'ports')
     networks = gc.get('SCANNER_CONFIG', 'networks')
+    local_interface_name = gc.get('SCANNER_CONFIG', 'local_interface_name')
     output_scans = gc.get('OUTPUT_PARTIAL_SCANS', 'path')
     
     # Create output folder for partial results if not exists
@@ -69,13 +70,14 @@ def main():
 
     # For every port specified en general config we perform an scanning on networks supplied too in gc
     for port in ports.split():
-        scan(port,networks,output_scans+'/results'+port+'.csv') 
+        scan(port,networks,local_interface_name, output_scans+'/results'+port+'.csv') 
 
     # Scanning results merged in one .csv file 
     mergeCSV_files(output_scans+'/results*.csv',output_scans+'/scanned_hosts.csv')
 
     # Upload all port_scanning information to ElasticSearch
     uploadPortScanELK(output_scans+'/scanned_hosts.csv')
+
 if __name__ == "__main__":
     main()
 

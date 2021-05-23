@@ -5,7 +5,7 @@ LABEL maintainer="pedcremo@gmail.com"
 LABEL version="0.1"
 LABEL description="This is custom Docker Image for the IOT Internet wide scanner."
 # Disable Prompt During Packages Installation
-ARG DEBIAN_FRONTEND=noninteractive
+#ARG DEBIAN_FRONTEND=noninteractive
 
 # Update Ubuntu Software repository
 RUN apt update
@@ -14,15 +14,8 @@ RUN apt update
 RUN apt install -y python3 python3-pip zmap git wget && \
     rm -rf /var/lib/apt/lists/* && \
     apt clean
-
-#Define the ENV variable
-ENV OPT /opt
-#ENV HOME /opt/iot_wide_scanner
-
 #Create project folder 
 RUN mkdir /root/iot_wide_scanner
-#Clone zgrab2 project
-#RUN cd /root && git clone https://github.com/zmap/zgrab2.git
 
 COPY config.ini /root/iot_wide_scanner
 COPY requirements.txt /root/iot_wide_scanner

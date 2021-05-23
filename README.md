@@ -1,11 +1,11 @@
-IMPORTANT: Change config_template.ini name to config.ini and fill real elasticsearch cretendials
+MOST IMPORTANT: Change config_template.ini name to config.ini and fill real elasticsearch cretendials
 
 # iot_internet_wide_scanner
 It's a simple IOT internet wide scanner. Indeed, currently is only a wide open public IPv4 device scanner. So it scans wathever device behind a public IPv4 specified in general config.ini file independently whether is an IoT device or other type of device as a regular server, a workstation .... 
 
 Similar to https://github.com/nray-scanner/nray
 
-# Prerequisites
+# Prerequisites if you don't want to use Docker Image to build a container
 - It is suposed that zmap and zgrab2 is installed in your operating system and available in system PATH (Instructions in document)
 - It is suposed we have an instance of elasticsearch and kibana installed and ready to use
 - Install scripts python libraries dependencies as root(sudoer) `sudo pip3 install -r requirements.txt` 
@@ -27,19 +27,30 @@ List images with
 `docker image ls`
 and check iot-scanner-image appears in list
 
-Execute container 
+Execute the container and mount source code from local to execute last changes
 `docker run -d -v /src:/opt/iot_wide_scanner --name test-container-iot iot-scanner-image`
 
-Execute container in interactive mode to do some checkings/testings
+Stop and/or remove container instance
 `docker container stop test-container-iot` #Stop running container
 `docker container rm test-container-iot` #Remove container 
 
-Entrem a una consola 
+Execute container in interactive mode to do some checkings/testings
 `docker run -v "$(pwd)"/src:/root/iot_wide_scanner/src --name test-container-iot -it iot-scanner-image /bin/bash`
 
-Executem el scanner
+Execute scanner/banner grabing/metadata enricher
 `docker run -v "$(pwd)"/src:/root/iot_wide_scanner/src --name test-container-iot -it iot-scanner-image`
-## HARD WAY
+
+# Pujar imatge a hub.docker.com
+
+1. docker login (credencials de dockerhub)
+2. docker tag iot-scanner-image:latest pedcremo/iot-scanner-image:latest (local remot)
+3. docker push pedcremo/iot-scanner-image:latest
+
+# Usar la imatge directament de hub.docker.com
+1. docker pull pedcremo/iot-scanner-image:latest
+2. docker run -v "$(pwd)"/src:/root/iot_wide_scanner_/src -it pedcremo/iot-scanner-image:latest (Has de tindre els scripts en la carpeta src o no podras fer res)
+
+## HARD WAY DIY (do int yourself from scratch)
 ### INSTALL ZMAP (tool for scanning)
 We can find easily zmap as a package ready to install for our Operating system 
 In ubuntu 20.04 it will be as:
