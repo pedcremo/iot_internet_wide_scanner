@@ -15,17 +15,18 @@ Similar to https://github.com/nray-scanner/nray
 5. `docker run -v "$(pwd)":/root/iot_wide_scanner/ --name test-container-iot -it pedcremo/iot-scanner-image /bin/bash` (Has d'executar aquest comandament des de l'arrel del projecte)
 6. `python3 src/main.py` Executarà tots els dies per la nit. Has de comprovar que les dades arriben bé al teu Elasticsearch. Si aquest pas no funciona cal que executes algun comandament per forçar arp a descobrir la MAC del gateway. Alguna cosa tipus `apt update` 
 
-# RUN
-- port scanner -> `sudo python3 src/modules/port_scanner/scanner.py`
-- banner grabber(depends on port scanner) -> `sudo python3 src/modules/banner_grabber/banner.py`
+# RUN manualment des del contenidor docker com a root.  
+- Executar solament el port scanner -> `python3 src/modules/port_scanner/scanner.py`
+- Executar solament el banner grabber(depends on port scanner) -> `python3 src/modules/banner_grabber/banner.py`
+- Executar tot amb un planificador -> `python3 src/main.py`
 
-
-# Prerequisites if you don't want to use Docker Image to build a container
-- It is suposed that zmap and zgrab2 is installed in your operating system and available in system PATH (Instructions in document)
-- It is suposed we have an instance of elasticsearch and kibana installed and ready to use
-- Install scripts python libraries dependencies as root(sudoer) `sudo pip3 install -r requirements.txt` 
-- Execute manually `sudo python3 scanner_module/scanner.py` and check scanning is working (NOTE )
-- If previous step works run `sudo python3 main.py` it will run all scripts using schedule specified in main.py
+# Si no volem usar docker el procés per usar aquestes eines és una mica més complex
+- Primerament caldrà insta·lar zmap i zgrab2 al nostre sistema operatiu i han d'estar disponibles com a comandament en el PATH del sistema. Ço és, podrem executar comandament `zmap` o `zgrab2` des de qualsevol part del sistema. Mirar com instal·lar ambdós eines en les instruccions de més abaix.
+- Hem de tindre instal·lada una instància de Elasticsearch i kibana llesta per usar i que conegam les seves credencials.Configurarem config.ini amb les credebcials d'ambdós eines
+- Hem de tindre instal·lat python3 així com pip3 per instal·lar les dependències de llibreries que necessita aquest projecte. Instal·larem les dependències com root(sudoer) `sudo pip3 install -r requirements.txt` 
+- Si tot ha funcionat correctament podrem executar el port scanner així `python3 src/modules/port_scanner/scanner.py`. Per l'eixida de consola comprovarem que estigui funcionant sense cap error i que estigui enviant correctament la informació a la nostra instància de Elasticsearch
+- Després provarem el mòdul de banner grabbing `python3 src/modules/banner_grabber/banner.py`. Si també ha funcionat correctament procedirem al pas següent
+- Si ja hem fet totes les comprovacions anteriors i tot funciona correctament amb `sudo python3 main.py` executarem tots els mòduls de manera periòdica totes les nits per recopilar informació de manera diaria
 
 
 # INSTALL 
