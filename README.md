@@ -218,3 +218,5 @@ synscan
 Disco
 Winfingerprint
 NetworkMiner
+
+OJO: cat input.txt |zgrab2 multiple -c multiple.ini -o prova.csv
