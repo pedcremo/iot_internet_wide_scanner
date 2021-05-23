@@ -34,11 +34,11 @@ Stop and/or remove container instance
 `docker container stop test-container-iot` #Stop running container
 `docker container rm test-container-iot` #Remove container 
 
-Execute container in interactive mode to do some checkings/testings
-`docker run -v "$(pwd)"/src:/root/iot_wide_scanner/src --name test-container-iot -it iot-scanner-image /bin/bash`
+Execute container in interactive mode to do some checkings/testings (PATH root project folder)
+`docker run -v "$(pwd)":/root/iot_wide_scanner/ --name test-container-iot -it iot-scanner-image /bin/bash`
 
-Execute scanner/banner grabing/metadata enricher
-`docker run -v "$(pwd)"/src:/root/iot_wide_scanner/src --name test-container-iot -it iot-scanner-image`
+Execute scanner/banner grabing/metadata enricher (PATH root project folder)
+`docker run -d -v "$(pwd)":/root/iot_wide_scanner/ --name test-container-iot -it iot-scanner-image`
 
 # Pujar imatge a hub.docker.com
 

@@ -5,6 +5,7 @@ import datetime
 import os 
 import sys
 import glob2
+import configparser
 
 PACKAGE_PARENT = '../../../'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
@@ -19,7 +20,11 @@ from src.modules.utils import putElasticBeat,getService
 # as a result we get a .csv outputfile with a line containing saddr,daddr,sport on opened host/port
 def scan(port,networks,local_interface_name, outputfile):
     try:
-        cmdline = 'zmap -i '+local_interface_name +' -p '+str(port)+' '+networks+' -f "saddr,daddr,sport"  --output-module=csv -o ' + outputfile
+        if local_interface_name is None:
+            cmdline = 'zmap -p '+str(port)+' '+networks+' -f "saddr,daddr,sport"  --output-module=csv -o ' + outputfile
+        else:    
+            cmdline = 'zmap -i '+local_interface_name +' -p '+str(port)+' '+networks+' -f "saddr,daddr,sport"  --output-module=csv -o ' + outputfile
+        
         zmap_proc = subprocess.Popen(args=shlex.split(cmdline), 
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
@@ -51,7 +56,12 @@ def main():
     gc = loadConfigFile()
     ports =  gc.get('SCANNER_CONFIG', 'ports')
     networks = gc.get('SCANNER_CONFIG', 'networks')
-    local_interface_name = gc.get('SCANNER_CONFIG', 'local_interface_name')
+    try:
+        local_interface_name = gc.get('SCANNER_CONFIG', 'local_interface_name')
+    except (KeyError, configparser.NoOptionError):
+        #We don't have that option enabled
+        local_interface_name = None
+    
     output_scans = gc.get('OUTPUT_PARTIAL_SCANS', 'path')
     
     # Create output folder for partial results if not exists

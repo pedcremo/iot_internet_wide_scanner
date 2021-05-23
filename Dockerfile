@@ -11,7 +11,8 @@ LABEL description="This is custom Docker Image for the IOT Internet wide scanner
 RUN apt update
 # Install python3 interpreter and python3-pip packet manager to run present project
 # install too zmap and git because we need as prerequisite to run present project
-RUN apt install -y python3 python3-pip zmap git wget && \
+# iproute2
+RUN apt install -y  python3 python3-pip zmap git wget  && \
     rm -rf /var/lib/apt/lists/* && \
     apt clean
 #Create project folder 
