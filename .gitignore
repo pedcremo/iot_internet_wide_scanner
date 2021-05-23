@@ -2,3 +2,5 @@ config.ini
 scanner_module/__pycache__
 scanner_module/out/*/**
 tmp/
+*.pyc 
+**/__pycache__/**

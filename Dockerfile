@@ -1,5 +1,6 @@
 #Download base image ubuntu 20.04
 FROM ubuntu:20.04
+#FROM debian
 # LABEL about the custom image
 LABEL maintainer="pedcremo@gmail.com"
 LABEL version="0.1"
@@ -8,17 +9,16 @@ LABEL description="This is custom Docker Image for the IOT Internet wide scanner
 #ARG DEBIAN_FRONTEND=noninteractive
 
 # Update Ubuntu Software repository
-RUN apt update
+RUN apt update 
 # Install python3 interpreter and python3-pip packet manager to run present project
 # install too zmap and git because we need as prerequisite to run present project
 # iproute2
-RUN apt install -y  python3 python3-pip zmap git wget  && \
+RUN apt install -y python3 python3-pip zmap git wget iproute2 && \
     rm -rf /var/lib/apt/lists/* && \
     apt clean
 #Create project folder 
 RUN mkdir /root/iot_wide_scanner
 
-COPY config.ini /root/iot_wide_scanner
 COPY requirements.txt /root/iot_wide_scanner
 RUN pip3 install -r /root/iot_wide_scanner/requirements.txt
 # We are going to compile zgrab2 programmed in golang
@@ -28,10 +28,15 @@ RUN tar -C /usr/local -xzf go1.16.3.linux-amd64.tar.gz
 # Configure PATH to find go interpreter in path
 ENV PATH="/usr/local/go/bin:${PATH}"
 
+# Descarreguem i compilem zgrab2
 RUN go get github.com/zmap/zgrab2
 RUN cd /root/go/pkg/mod/github.com/zmap/zgrab2@v0.1.7 && go mod download github.com/stretchr/testify
 RUN cd /root/go/pkg/mod/github.com/zmap/zgrab2@v0.1.7 && make
 RUN ln -s /root/go/pkg/mod/github.com/zmap/zgrab2@v0.1.7/zgrab2 /usr/bin/zgrab2
+
+# Descarreguem zannotate
+RUN go get github.com/zmap/zannotate
+
 WORKDIR /root/iot_wide_scanner
 CMD [ "python3", "./src/main.py" ]
 

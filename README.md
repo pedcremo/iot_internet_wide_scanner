@@ -1,9 +1,24 @@
 MOST IMPORTANT: Change config_template.ini name to config.ini and fill real elasticsearch cretendials
 
-# iot_internet_wide_scanner
+# IOT internet wide scanner
 It's a simple IOT internet wide scanner. Indeed, currently is only a wide open public IPv4 device scanner. So it scans wathever device behind a public IPv4 specified in general config.ini file independently whether is an IoT device or other type of device as a regular server, a workstation .... 
 
 Similar to https://github.com/nray-scanner/nray
+
+# Usar eines de manera ràpida i fàcil
+
+# Usar la imatge directament de hub.docker.com (docker instal·lat al sistema i un elasticsearch en funcionament)
+1. `docker pull pedcremo/iot-scanner-image:latest`
+2. `git clone https://github.com/pedcremo/iot_internet_wide_scanner`
+3. `cd iot_internet_wide_scanner`
+4. El config.ini el tenim correctament configurat amb les xarxes/ports a escanejar i la instància Elasticsearch correctament configurada per poder enviar-li la informació dels escanejos i banner grabbing
+5. `docker run -v "$(pwd)":/root/iot_wide_scanner/ --name test-container-iot -it pedcremo/iot-scanner-image /bin/bash` (Has d'executar aquest comandament des de l'arrel del projecte)
+6. `python3 src/main.py` Executarà tots els dies per la nit. Has de comprovar que les dades arriben bé al teu Elasticsearch. Si aquest pas no funciona cal que executes algun comandament per forçar arp a descobrir la MAC del gateway. Alguna cosa tipus `apt update` 
+
+# RUN
+- port scanner -> `sudo python3 src/modules/port_scanner/scanner.py`
+- banner grabber(depends on port scanner) -> `sudo python3 src/modules/banner_grabber/banner.py`
+
 
 # Prerequisites if you don't want to use Docker Image to build a container
 - It is suposed that zmap and zgrab2 is installed in your operating system and available in system PATH (Instructions in document)
@@ -12,9 +27,6 @@ Similar to https://github.com/nray-scanner/nray
 - Execute manually `sudo python3 scanner_module/scanner.py` and check scanning is working (NOTE )
 - If previous step works run `sudo python3 main.py` it will run all scripts using schedule specified in main.py
 
-# RUN
-- port scanner -> `sudo python3 src/modules/port_scanner/scanner.py`
-- banner grabber(depends on port scanner) -> `sudo python3 src/modules/banner_grabber/banner.py`
 
 # INSTALL 
 ## EASY WAY
@@ -46,9 +58,7 @@ Execute scanner/banner grabing/metadata enricher (PATH root project folder)
 2. docker tag iot-scanner-image:latest pedcremo/iot-scanner-image:latest (local remot)
 3. docker push pedcremo/iot-scanner-image:latest
 
-# Usar la imatge directament de hub.docker.com
-1. docker pull pedcremo/iot-scanner-image:latest
-2. docker run -v "$(pwd)"/src:/root/iot_wide_scanner_/src -it pedcremo/iot-scanner-image:latest (Has de tindre els scripts en la carpeta src o no podras fer res)
+
 
 ## HARD WAY DIY (do int yourself from scratch)
 ### INSTALL ZMAP (tool for scanning)
