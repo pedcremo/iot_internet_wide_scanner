@@ -124,11 +124,25 @@ def uploadBannersELK(regex_path_banners):
                         llista = list(dict_aux['data'].keys())
                         #print(llista)
                         #print(dict_aux['data'][llista[0]])
-                        json_body = {
-                            "doc": {
-                                "banner": dict_aux['data'][llista[0]]
+                        try:
+                            json_body = {
+                                "doc": {
+                                    "banner.status": dict_aux['data'][llista[0]]['status'],
+                                    "banner.protocol": dict_aux['data'][llista[0]]['protocol'],                                
+                                    "banner.result": json.dumps(dict_aux['data'][llista[0]]['result']),                                
+                                    "banner.timestamp": dict_aux['data'][llista[0]]['timestamp']
+                                    
+                                }
                             }
-                        }                                 
+                        except KeyError:
+                             json_body = {
+                                "doc": {
+                                    "banner.status": dict_aux['data'][llista[0]]['status'],
+                                    "banner.protocol": dict_aux['data'][llista[0]]['protocol'],                                
+                                    "banner.error": dict_aux['data'][llista[0]]['error'],
+                                    "banner.timestamp": dict_aux['data'][llista[0]]['timestamp']                                    
+                                }
+                            }                                    
                         upsertElastic(index_name,json_body,getId(dict_aux['ip']+grabbing_ip_source+port)) 
                 
                 except json.decoder.JSONDecodeError as jerr:
