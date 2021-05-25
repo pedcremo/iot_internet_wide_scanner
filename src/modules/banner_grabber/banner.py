@@ -11,29 +11,9 @@ import subprocess
 import shlex
 import ast
 
-'''
-def getServicePort(sport):
-    ports_services = {
-        '80': 'http',
-        '443': 'tls',        
-        '21': 'ftp',
-        '22': 'ssh',
-        '23': 'telnet',        
-        '143': 'imap',
-        '25': 'smtp'        
-    }
-    try:
-        return ports_services[sport]
-    except KeyError as e:
-        return "banner" #Try to get banner generically
-'''
 def getBanners(daddr,sport,input_file, output_scans):
     
-    try:
-        #zgrab2 ftp -f inputFTP.csv -o outputFTP.csv
-        #service = getServicePort(sport)
-        #cmdline = 'zgrab2 '+service+' -f '+input_file+' -o '+output_scans+'/out_zgrab_'+service+'_'+sport+'_'+daddr+'_.csv'  
-        
+    try:            
         catproces = subprocess.Popen(args=shlex.split('cat '+input_file), stdout=subprocess.PIPE)
 
         cmdline = ' zgrab2 multiple -c multiple.ini -o '+output_scans+'/out_zgrab_'+sport+'_'+daddr+'_.csv'  
@@ -72,8 +52,10 @@ def main():
             for index,row in dfaux.iterrows():                
                 dfObj = dfObj.append({'ip': row['saddr'], 'empty': ' ', 'trigger': protocol+str(port)}, ignore_index=True)
         
-        dfObj.to_csv(output_scans+"/input_zgrab_"+str(port)+".csv",index=False,header=False)
-        getBanners(df['daddr'][0],port,output_scans+"/input_zgrab_"+str(port)+".csv",output_scans)
+        # If there are more than one row
+        if dfObj.shape[0] > 0:
+            dfObj.to_csv(output_scans+"/input_zgrab_"+str(port)+".csv",index=False,header=False)
+            getBanners(df['daddr'][0],port,output_scans+"/input_zgrab_"+str(port)+".csv",output_scans)
 
     # Scanning results merged in one .csv file 
     merge_files(output_scans+'/out_zgrab_*.csv',output_scans+'/banners_hosts.csv')
