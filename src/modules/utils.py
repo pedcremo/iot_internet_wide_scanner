@@ -108,9 +108,9 @@ def uploadBannersELK(regex_path_banners):
         try:
             tokens = f.split("_")
             print(tokens)
-            service = tokens[2]
-            port = tokens[3]
-            grabbing_ip_source = tokens[4]
+            #service = tokens[2]
+            port = tokens[2]
+            grabbing_ip_source = tokens[3]
 
             Lines = file1.readlines()
             

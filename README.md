@@ -220,3 +220,18 @@ Winfingerprint
 NetworkMiner
 
 OJO: cat tests/zgrab_input_file_multiple.txt |zgrab2 multiple -c multiple.ini -o prova.csv
+
+# Kibana dev console
+Delete all documents from index
+<pre>
+POST wifibytes_scanned/_delete_by_query?conflicts=proceed
+{
+ "query": {
+ "match_all": {}
+ }
+}
+</pre>
+Retrieve all documents from index 
+<pre>
+GET wifibytes_scanned/_search
+</pre>
