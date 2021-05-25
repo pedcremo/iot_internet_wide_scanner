@@ -9,7 +9,9 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from src.modules.utils import loadConfigFile, merge_files, uploadBannersELK
 import subprocess
 import shlex
+import ast
 
+'''
 def getServicePort(sport):
     ports_services = {
         '80': 'http',
@@ -24,18 +26,25 @@ def getServicePort(sport):
         return ports_services[sport]
     except KeyError as e:
         return "banner" #Try to get banner generically
-
+'''
 def getBanners(daddr,sport,input_file, output_scans):
     
     try:
         #zgrab2 ftp -f inputFTP.csv -o outputFTP.csv
-        service = getServicePort(sport)
-        cmdline = 'zgrab2 '+service+' -f '+input_file+' -o '+output_scans+'/out_zgrab_'+service+'_'+sport+'_'+daddr+'_.csv'  
+        #service = getServicePort(sport)
+        #cmdline = 'zgrab2 '+service+' -f '+input_file+' -o '+output_scans+'/out_zgrab_'+service+'_'+sport+'_'+daddr+'_.csv'  
+        
+        catproces = subprocess.Popen(args=shlex.split('cat '+input_file), stdout=subprocess.PIPE)
+
+        cmdline = ' zgrab2 multiple -c multiple.ini -o '+output_scans+'/out_zgrab_'+sport+'_'+daddr+'_.csv'  
 
         zgrab2_proc = subprocess.Popen(args=shlex.split(cmdline), 
+                    stdin=catproces.stdout,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     universal_newlines=True, bufsize=0)
+        
+        catproces.wait()
         print(shlex.split(cmdline))
         #uploadBannersELK(daddr,service,sport,output_scans+'/out_zgrab_'+service+'_'+sport+'_'+daddr.csv')
         
@@ -51,13 +60,20 @@ def main():
 
     # Get pandas dataframe from CSV
     df=pd.read_csv(output_scans+'/scanned_hosts.csv')
-    print(df)
+    #print(df)
     
     # For every port specified en general config we perform an scanning on networks supplied too in gc
     for port in ports.split():
         dfaux = df[df.sport == int(port)]
-        #print(dfaux)
-        dfaux['saddr'].to_csv(output_scans+"/input_zgrab_"+str(port)+".csv",index=False,header=False)
+        
+        protocols = ast.literal_eval(gc.get('BANNER_CONFIG', port))
+        dfObj = pd.DataFrame(columns=['ip', 'empty', 'trigger'])
+        
+        for protocol in protocols:
+            for index,row in dfaux.iterrows():                
+                dfObj = dfObj.append({'ip': row['saddr'], 'empty': ' ', 'trigger': protocol+str(port)}, ignore_index=True)
+        
+        dfObj.to_csv(output_scans+"/input_zgrab_"+str(port)+".csv",index=False,header=False)
         getBanners(df['daddr'][0],port,output_scans+"/input_zgrab_"+str(port)+".csv",output_scans)
 
     # Scanning results merged in one .csv file 
