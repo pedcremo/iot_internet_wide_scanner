@@ -112,30 +112,25 @@ def uploadBannersELK(regex_path_banners):
             port = tokens[2]
             grabbing_ip_source = tokens[3]
 
-            Lines = file1.readlines()
-            
+            Lines = file1.readlines()                 
             print("UPLOADING Arxiu "+f)
-                    
-
             for line in Lines:
 
                 try:
                     dict_aux = json.loads(line)
                     #print(dict_aux)
-                    '''json_body = {
-                        "script" : "ctx._source.banner = '"+json.dumps(dict_aux)+"'"
-                    }'''
-                    json_body = {
-                        "doc": {
-                            "banner": dict_aux
-                        }
-                    }
-                            
-                    
-                    #print(json_body)
-                    #id_ = hash(dict_aux['ip']+grabbing_ip_source+port)
-                    
-                    upsertElastic(index_name,json_body,getId(dict_aux['ip']+grabbing_ip_source+port)) 
+                    if dict_aux['data']:
+                       
+                        llista = list(dict_aux['data'].keys())
+                        #print(llista)
+                        #print(dict_aux['data'][llista[0]])
+                        json_body = {
+                            "doc": {
+                                "banner": dict_aux['data'][llista[0]]
+                            }
+                        }                                 
+                        upsertElastic(index_name,json_body,getId(dict_aux['ip']+grabbing_ip_source+port)) 
+                
                 except json.decoder.JSONDecodeError as jerr:
                     print ("Error parsing JSON "+line+" skipping...", jerr)
 
@@ -164,7 +159,7 @@ def upsertElastic(index_name,json_body,id):
     global es     
     try:
         response = es.update(index=index_name,doc_type = '_doc', body=json_body , request_timeout = 45, id = id)
-        #print("response:",response)
+        print("response:",response)
     except Exception as err:
         print("Elasticsearch index("+index_name+") ERROR (in upsertElasticBeat):", err)
 

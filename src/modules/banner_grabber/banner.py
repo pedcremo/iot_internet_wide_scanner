@@ -46,7 +46,6 @@ def getBanners(daddr,sport,input_file, output_scans):
         
         catproces.wait()
         print(shlex.split(cmdline))
-        #uploadBannersELK(daddr,service,sport,output_scans+'/out_zgrab_'+service+'_'+sport+'_'+daddr.csv')
         
     except OSError as e:
         print(e)
