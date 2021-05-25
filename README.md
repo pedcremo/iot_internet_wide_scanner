@@ -1,9 +1,9 @@
-MOST IMPORTANT: Change config_template.ini name to config.ini and fill real elasticsearch cretendials
+MOST IMPORTANT: Rename config_template.ini file to config.ini and fill up with real Elasticsearch credendials and networks
 
 # IOT internet wide scanner
-It's a simple IOT internet wide scanner. Indeed, currently is only a wide open public IPv4 device scanner. So it scans wathever device behind a public IPv4 specified in general config.ini file independently whether is an IoT device or other type of device as a regular server, a workstation .... 
+It's a simple IOT internet wide scanner. Indeed, currently is only a wide open public IPv4 device scanner. So it scans wathever device behind a public IPv4 specified using network ranges in config.ini file config.  Independently whether is an IoT device or other type of device as a regular server, a workstation .... checks for opened ports and try to grab the banners associated with that ports. All gathered information is sent to an ElasticSearch cluster in order to index, enrich and prepare for future retrieval. 
 
-Similar to https://github.com/nray-scanner/nray
+It's quite imilar to https://github.com/nray-scanner/nray
 
 # Usar eines de manera ràpida i fàcil
 
@@ -219,4 +219,4 @@ Disco
 Winfingerprint
 NetworkMiner
 
-OJO: cat input.txt |zgrab2 multiple -c multiple.ini -o prova.csv
+OJO: cat tests/zgrab_input_file_multiple.txt |zgrab2 multiple -c multiple.ini -o prova.csv

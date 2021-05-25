@@ -12,7 +12,6 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 from src.modules.utils import loadConfigFile, uploadPortScanELK,mergeCSV_files 
-from src.modules.utils import putElasticBeat,getService
 
 # IMPORTANT NOTE: This script doesn't work without zmap installed on our system and available in system PATH # 
 

@@ -7,6 +7,7 @@ import os
 import pandas as pd 
 import glob2 
 import json
+import ast
 
 def loadConfigFile():
     configParser = configparser.ConfigParser()   
@@ -15,6 +16,29 @@ def loadConfigFile():
     #print(os.path.dirname(__file__))
     return configParser
 
+def generateMultipleIni(gc):    
+
+    f = open(os.path.join(os.path.dirname(__file__), '../../multiple.ini'),'w')
+    for (each_key,each_val) in gc.items('BANNER_CONFIG'):        
+        port = each_key
+        protocols = ast.literal_eval(each_val)
+        for item in protocols:            
+            if item=='https':
+                s= '''
+                    [http]
+                    trigger="https{port_}"
+                    name="https{port_}"
+                    port={port_}
+                    use-https=True'''.format(port_=port)
+            else:
+                s= '''
+                    [{item_}]
+                    trigger="{item_}{port_}"
+                    name="{item_}{port_}"
+                    port={port_}'''.format(port_=port,item_=item)
+
+            f.write(s+"\n")
+    f.close()
 gc = loadConfigFile()
 endpoint = gc.get('ELASTIC_SERVER', 'endpoint')
 username = gc.get('ELASTIC_SERVER', 'username')
@@ -22,6 +46,11 @@ password = gc.get('ELASTIC_SERVER', 'password')
 index_name = gc.get('ELASTIC_SERVER', 'index_name')
 port = gc.get('ELASTIC_SERVER', 'port')
 es = Elasticsearch([endpoint],http_auth=(username,password),scheme="https",port=port)
+generateMultipleIni(gc)
+
+
+
+
 
 '''def uploadCsvElastic(index_name, csv_path):
     global es
@@ -122,7 +151,7 @@ def uploadPortScanELK(csv_path):
                 "target_addr":row['saddr'],
                 "scanning_addr":row['daddr'],
                 "port":str(row['sport']),
-                "protocol":getService(str(row['sport'])),
+                #"protocol":getService(str(row['sport'])),
                 "lastScanned_timestamp": datetime.datetime.now()
         }
         putElasticBeat(index_name,doc_body,getId(row['saddr']+row['daddr']+str(row['sport'])))
@@ -158,6 +187,8 @@ def merge_files(file_regex,output_csv_file):
                 for line in infile:
                     outfile.write(line)
 
+#DEPRECATED
+'''
 def getService(port):   
     ports_services = {
         '80': 'http',
@@ -175,4 +206,4 @@ def getService(port):
         '1554':'rtsp',
     }
           
-    return ports_services[port]
+    return ports_services[port]'''
