@@ -10,6 +10,7 @@ from src.modules.utils import loadConfigFile, merge_files, uploadBannersELK
 import subprocess
 import shlex
 import ast
+from threading import Timer
 
 def getBanners(daddr,sport,input_file, output_scans):
     
@@ -61,7 +62,9 @@ def main():
     merge_files(output_scans+'/out_zgrab_*.csv',output_scans+'/banners_hosts.csv')
 
     # Upload all banner information to ElasticSearch
-    uploadBannersELK(output_scans+'/out_zgrab_*.csv')
+    r = Timer(180.0, uploadBannersELK, [output_scans+'/out_zgrab_*.csv'])
+    #uploadBannersELK(output_scans+'/out_zgrab_*.csv')
+    r.start()
 
 if __name__ == "__main__":
     main()

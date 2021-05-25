@@ -122,7 +122,7 @@ def uploadBannersELK(regex_path_banners):
                     if dict_aux['data']:
                        
                         llista = list(dict_aux['data'].keys())
-                        #print(llista)
+                        print(llista)
                         #print(dict_aux['data'][llista[0]])
                         try:
                             json_body = {
