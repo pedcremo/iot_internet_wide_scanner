@@ -11,28 +11,9 @@ import subprocess
 import shlex
 import ast
 
-'''
-def getServicePort(sport):
-    ports_services = {
-        '80': 'http',
-        '443': 'tls',        
-        '21': 'ftp',
-        '22': 'ssh',
-        '23': 'telnet',        
-        '143': 'imap',
-        '25': 'smtp'        
-    }
-    try:
-        return ports_services[sport]
-    except KeyError as e:
-        return "banner" #Try to get banner generically
-'''
 def getBanners(daddr,sport,input_file, output_scans):
     
     try:
-        #zgrab2 ftp -f inputFTP.csv -o outputFTP.csv
-        #service = getServicePort(sport)
-        #cmdline = 'zgrab2 '+service+' -f '+input_file+' -o '+output_scans+'/out_zgrab_'+service+'_'+sport+'_'+daddr+'_.csv'  
         
         catproces = subprocess.Popen(args=shlex.split('cat '+input_file), stdout=subprocess.PIPE)
 
@@ -45,8 +26,7 @@ def getBanners(daddr,sport,input_file, output_scans):
                     universal_newlines=True, bufsize=0)
         
         catproces.wait()
-        print(shlex.split(cmdline))
-        #uploadBannersELK(daddr,service,sport,output_scans+'/out_zgrab_'+service+'_'+sport+'_'+daddr.csv')
+        print(shlex.split(cmdline))    
         
     except OSError as e:
         print(e)
