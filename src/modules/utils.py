@@ -1,7 +1,7 @@
 import configparser
 from elasticsearch import helpers,Elasticsearch
 import datetime 
-from datetime import date
+from datetime import date, time
 import subprocess
 import os
 import pandas as pd 
@@ -39,6 +39,7 @@ def generateMultipleIni(gc):
 
             f.write(s+"\n")
     f.close()
+
 gc = loadConfigFile()
 endpoint = gc.get('ELASTIC_SERVER', 'endpoint')
 username = gc.get('ELASTIC_SERVER', 'username')
@@ -62,31 +63,11 @@ def putElasticBeat(index_name,json_body,id):
     except Exception as err:
         print("Elasticsearch index(" + index_name + ") ERROR (in putElasticBeat):", err)
 
-'''
-def addServiceElasticBeat(index_name,port,protocol,banner,id):
-    global es
-    try:
-        update_query= {
-            'script':{
-                'source':'ctx._source.services.add(params.service)',    
-                'params':{
-                    'service':{
-                        'port':port,
-                        'protocol':protocol,
-                        'banner':banner,
-                        'lastSeen_timestamp': datetime.datetime.now()
-                    }
-                }
-            }
-        }
-        response = es.update(index=index_name,doc_type = '_doc', body=update_query , request_timeout = 45, id = id)
-        #print("response:",response)
-    except Exception as err:
-        print("Elasticsearch index() ERROR (in putElasticBeat):", err)
-
-'''
 def uploadBannersELK(regex_path_banners):
     global index_name
+    timestamp = datetime.datetime.now()
+    dateStr = timestamp.strftime("%Y-%m-%d")
+
     # Delete output temporal .csv files
     files = glob2.glob(regex_path_banners)
     print("UPLOADING FILES "+str(files))
@@ -130,7 +111,7 @@ def uploadBannersELK(regex_path_banners):
                                     "banner.timestamp": dict_aux['data'][llista[0]]['timestamp']                                    
                                 }
                             }                                    
-                        upsertElastic(index_name,json_body,getId(dict_aux['ip']+grabbing_ip_source+port)) 
+                        upsertElastic(index_name+"-"+dateStr,json_body,getId(dict_aux['ip']+grabbing_ip_source+port)) 
                 
                 except json.decoder.JSONDecodeError as jerr:
                     print ("Error parsing JSON "+line+" skipping...", jerr)
@@ -142,23 +123,27 @@ def uploadPortScanELK(csv_path):
     global index_name
     df=pd.read_csv(csv_path)
     
+    timestamp = datetime.datetime.now()
+    dateStr = timestamp.strftime("%Y-%m-%d")
+
     for index, row in df.iterrows():               
         doc_body = {
                 "destination.ip":row['saddr'],
                 "source.ip":row['daddr'],
                 "destination.port":str(row['sport']),
                 #"protocol":getService(str(row['sport'])),
-                "@timestamp": datetime.datetime.now()
+                "@timestamp": timestamp
         }
-        putElasticBeat(index_name,doc_body,getId(row['saddr']+row['daddr']+str(row['sport'])))
+        putElasticBeat(index_name+"-"+dateStr,doc_body,getId(row['saddr']+row['daddr']+str(row['sport'])))
     
-def getId(targetIp_sourceIp_targetPort):
-    #print("HAsh generat amb "+targetIp_sourceIp_targetPort+" hash="+str(hash(targetIp_sourceIp_targetPort)))
+def getId(targetIp_sourceIp_targetPort):    
     return targetIp_sourceIp_targetPort
 
 def upsertElastic(index_name,json_body,id):
     global es     
     try:
+        #timestamp = datetime.datetime.now()
+        #dateStr = timestamp.strftime("%Y-%m-%d")
         response = es.update(index=index_name,doc_type = '_doc', body=json_body , request_timeout = 45, id = id)
         print("response:",response)
     except Exception as err:
@@ -182,24 +167,3 @@ def merge_files(file_regex,output_csv_file):
             with open(fname) as infile:
                 for line in infile:
                     outfile.write(line)
-
-#DEPRECATED
-'''
-def getService(port):   
-    ports_services = {
-        '80': 'http',
-        '443': 'https',
-        '8080': 'http',
-        '8443': 'https',
-        '21': 'ftp',
-        '22': 'ssh',
-        '23': 'telnet',
-        '161': 'snmp',
-        '143': 'imap',
-        '25': 'smtp',
-        '5060': 'sip',
-        '554': 'rtsp',
-        '1554':'rtsp',
-    }
-          
-    return ports_services[port]'''
