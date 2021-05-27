@@ -48,20 +48,6 @@ port = gc.get('ELASTIC_SERVER', 'port')
 es = Elasticsearch([endpoint],http_auth=(username,password),scheme="https",port=port)
 generateMultipleIni(gc)
 
-
-
-
-
-'''def uploadCsvElastic(index_name, csv_path):
-    global es
-    dateStr = date.today().strftime("%d.%m.%Y")
-    try:
-        with open(csv_path) as f:
-            reader = csv.DictReader(f)
-            helpers.bulk(es, reader, index=index_name+'-'+dateStr)
-    except Exception as err:
-        print("Elasticsearch index() ERROR (in uploadCsvElastic):", err)
-'''
 def putElasticBeat(index_name,json_body,id):
     global es     
     try:
@@ -76,6 +62,7 @@ def putElasticBeat(index_name,json_body,id):
     except Exception as err:
         print("Elasticsearch index(" + index_name + ") ERROR (in putElasticBeat):", err)
 
+'''
 def addServiceElasticBeat(index_name,port,protocol,banner,id):
     global es
     try:
@@ -97,7 +84,7 @@ def addServiceElasticBeat(index_name,port,protocol,banner,id):
     except Exception as err:
         print("Elasticsearch index() ERROR (in putElasticBeat):", err)
 
-
+'''
 def uploadBannersELK(regex_path_banners):
     global index_name
     # Delete output temporal .csv files
@@ -157,11 +144,11 @@ def uploadPortScanELK(csv_path):
     
     for index, row in df.iterrows():               
         doc_body = {
-                "target_addr":row['saddr'],
-                "scanning_addr":row['daddr'],
-                "port":str(row['sport']),
+                "destination.ip":row['saddr'],
+                "source.ip":row['daddr'],
+                "destination.port":str(row['sport']),
                 #"protocol":getService(str(row['sport'])),
-                "lastScanned_timestamp": datetime.datetime.now()
+                "@timestamp": datetime.datetime.now()
         }
         putElasticBeat(index_name,doc_body,getId(row['saddr']+row['daddr']+str(row['sport'])))
     
