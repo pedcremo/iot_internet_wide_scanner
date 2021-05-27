@@ -57,6 +57,7 @@ def putElasticBeat(index_name,json_body,id):
             doc_type = '_doc',
             body = json_body,
             request_timeout = 45,
+            pipeline = 'wifibytes_user_geo',
             id = id
         )
         #print("response:",response)
